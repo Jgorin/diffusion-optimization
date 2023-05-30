@@ -7,14 +7,14 @@ class DiffusionProblem(Problem):
         lb = [b[0] for b in bounds]
         ub = [b[1] for b in bounds]
         
-        constraint_lb = [0,float("-inf")]
-        constraint_ub = [float("inf"),0]
+        constraint_lb = [0,0]
+        constraint_ub = [1,0]
         self.n_constraints = 2
         
         super().__init__(n=len(bounds), m=2, lb=lb, ub=ub, cl=constraint_lb, cu=constraint_ub)
         
         self._objective = objective
-        self.jac = jax.jacfwd(self.constraints)
+        self.constraint_jacobian = jax.jacfwd(self.constraints)
         
     
     def objective(self, X):
@@ -42,10 +42,10 @@ class DiffusionProblem(Problem):
         lnD0aa_constraint = 0
         for i in range(len(lnD0aa)-1):
             if lnD0aa[i]-lnD0aa[i+1] <= 0:
-                lnD0aa_constraint += lnD0aa[i]-lnD0aa[i+1]
+                lnD0aa_constraint += max(lnD0aa[i]-lnD0aa[i+1], 0)
                 
         return jnp.array([frac_constraint, lnD0aa_constraint])
     
     
     def jacobian(self, X):
-        return self.jac(X)
+        return self.constraint_jacobian(X)

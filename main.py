@@ -16,7 +16,7 @@ objective = DiffusionObjective(
     time_add = jnp.array([300*60,2003040*60]), 
     temp_add = jnp.array([40,21.111111111111]), 
     pickle_path = f"{dir_path}/data/lookup_table.pkl",
-    omitValueIndices= [1,2,45]#[range(18,33)])
+    omitValueIndices= []#[range(18,33)])
 )
 
 bounds = [
@@ -32,7 +32,7 @@ bounds = [
 problem = DiffusionProblem(objective, bounds) 
 problem.add_option('mu_strategy', 'adaptive')
 problem.add_option('check_derivatives_for_naninf', 'yes')
-problem.add_option('max_iter', 200)
+problem.add_option('max_iter', 1000)
 
 x0 = jnp.array([0.5*(b[0]+b[1]) for b in bounds])
 params, info = problem.solve(x0)
